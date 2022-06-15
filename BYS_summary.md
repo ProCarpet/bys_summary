@@ -43,7 +43,7 @@ Weil UEFI einfach verschiedene EFI Anwendungen ausführen kann muss kein boot-lo
 
 ## GPT
 Ersatz für MBR, kann mehr als 2tb grosse paritionen verwalten. MBR header scheint aus legacy Gründen vorhanden zu sein. Auf dem GPT sind auch die infromationen wo der zu bootended Kernel liegt und beim kernel liegt auch die `inital ram disk` der `bootloader` dekomprimiert den kernel und läd die inital ram disk (welche die kernelmodule udn spezielle devie-special files beinhaltet wie etwas /dev/null)in den ram, der Kernel mounted diese dan als filesystem und startet. Jetzt kann der kernel das reguläre file system finden und dieses booten.\
-<img src="img/gpt.png" alt="drawing" width="400"/>
+<img src="img/gpt.PNG" alt="drawing" width="400"/>
 ### Runlevel
 
 | ID | Name                                                                  | Description                                                                |
@@ -78,7 +78,7 @@ Units haben states
 - `activating/deactivating` in the process of changing state
 - `failed` faile din som way with error code or timeouted
 
-<img src="img/unit_types.png" alt="drawing" width="700"/>
+<img src="img/unit_types.PNG" alt="drawing" width="700"/>
  
 Service Units starten und kontrollieren Daemons und die prozesse aus welchen diese bestehen.
 
@@ -181,13 +181,13 @@ Benötigt einen Scheduler / Dispatcher, etc.
 * Ein Prozsess kann in eine `cgroup` verschoben werden in dem man seine PID in das `cgroup.proces` file einträgt. 
 * Das einschreiben der PID eines Prozesses in eine `cgroup` entfernt automatisch alle anderen angehörigkeiten. 
 
-<img src="img/cgroup1.png" alt="drawing" width="600"/>
+<img src="img/cgroup1.PNG" alt="drawing" width="600"/>
 
 * Der CPU Kontroller kann nicht an zwei verschiedenen hirarchien angehängt werden.\
 Entweder der Hierarchie cpu_cg oder cpu_mem_cg(cpu_cg/_mem_cg sind filesystems). cg1/2 hier sind `cgroup`s
 * Eine `cgroup` Hierarchie kann aber mehrere Kontroller haben. 
 
-<img src="img/cgroup2.png" alt="drawing" width="600"/>
+<img src="img/cgroup2.PNG" alt="drawing" width="600"/>
 
 * Ein prozess gehört einer Cgropu an und kann mehrere Threads haben.
 Diese Tasks/Threads können aber nicht mehreren cgropus angehören. 
@@ -380,7 +380,7 @@ From a user perspective there are
 
 ## I/O HW Architecture
 
-<img src="img/IO_HW_architecture.png" alt="drawing" width="400"/>
+<img src="img/IO_HW_architecture.PNG" alt="drawing" width="400"/>
 
 
 ### I/O controller 
