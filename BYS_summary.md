@@ -31,7 +31,8 @@ UEFI kann den kernel selbst direkt laden.
 ## MBR (GRUB) mit BIOS [https://www.akadia.com/services/dual_boot.html]
 * Der MBR ist auf den ersten 512 bytes des boot-device. Von ihnen sind die ersten 446 bytes sind reserviert für bootloader informationen. die nächsten 64 bytes sind für die Parititions Tabellen, die letzen 2 bytes sind die Magic numbers welche benutzt werden um einen Validation check für den MBR durchzuführen im falle eines Interrupts. 
 * Der GRBU bootloader unterstützt `Chain-Loading` was ermöglicht nicht unterstütze Betriebssysteme laufen zu lassen. In diesem falle wird einfach nach GRUB der 2e Bootloader ausgeführt welcher von einer anderen Partition bootet. 
-<img src="img/mbr.png" alt="drawing" width=""/>
+
+<img src="img/mbr.PNG" alt="drawing" width=""/>
 
 ## UEFI [https://www.happyassassin.net/posts/2014/01/25/uefi-boot-how-does-that-actually-work-then/]
 `Unified Extensible Firmware Interface` unterstützt das lesen von Parititonstabellen und File systems. Es führt keinen code des `MBR` anstelle führt es code vom `NVRAM (Non-volatile random-access memory)` aus.\
@@ -380,7 +381,7 @@ From a user perspective there are
 
 ## I/O HW Architecture
 
-<img src="img/IO_HW_architecture.PNG" alt="drawing" width="400"/>
+<img src="img/IO_HW_architecture.png" alt="drawing" width="400"/>
 
 
 ### I/O controller 
