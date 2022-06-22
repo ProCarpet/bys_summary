@@ -107,6 +107,7 @@ Sind ziele für systemd welche es zu systemstart ausführt z.b. müsste ein targ
 ## Deamons 
 * Sind unabhängig von andreen system servies. 
 * Sie haben keine chronologische reihenfolge. 
+* Sind nicht an der Shell angebunden. 
 
 ## Sysetm services
 **System services** sind: 
@@ -123,7 +124,7 @@ Kann mit `fork()` erstellt werden.\
 Ein Prozess ist immer in einem der folgenden Zustände: 
 * Running 
   * Cpu assigned
-* Rady
+* Ready
   * Runnable Waiting for first go or temporarily stopped (idle)
 * Blocked
   * Unable to run (sleeping)
@@ -318,6 +319,8 @@ $$
 
 
 ## RTS Scheduler
+
+### Monotonic Scheduler
 * Highest priority given to task with highes repititon rate
 $$
 U_{tot} = \frac{4}{10}+\frac{8}{20}+\frac{5}{30} = 0.97
@@ -325,8 +328,9 @@ $$
 Hat eine auslastung von 97%.\
 Jeder task bekommt garantierte Zeitfenster in denen er ausgeführt wird.\
 Es gibt eine Garantie das der Task ausgeführt wird wenn folgendes gegeben ist:
-$$C_i \text{is runtime}$$
-$$T_i \text{is period}$$
+$$C_i = \text{is runtime}$$
+$$T_i = \text{is period}$$ 
+$$n = \text{Anzahl Tasks}$$
 $$
 U = \sum^n_{i=1}\frac{C_i}{T_i}\leq n(2^{1/n}-1)
 $$
@@ -334,7 +338,7 @@ $$
 \lim_{n\rightarrow\infty}n(\sqrt[n]{2}-1)
 $$
 
-### Deadline Scheduling
+### Deadline Scheduling earlies deadline first
 * Scheduler bestimmt den task mit der nexten deadline und schedulet ihn
 * Wenn die Utilisation nicht höher als 100% ist dann ist eine schedule ereichbar
 
@@ -363,10 +367,85 @@ $$
 
 # Memory
 
+* Memory ist eine system resource und ist deswegen vom OS gemanaged
+* Memory ist ist hirarchisch organisiert. 
+  * Fast = Cache
+  * Main memory = RAM
+  * Secondary memory = HDD/SSD's
+    * Programme und Files
+  * Teritary memory
+    * backup storage, tapes, cold storage. 
 
-//TODO
+## Multi Process memory management
+Wenn wir nur einen einzelnen Prozess hätten bräuchten wir kein memory management und könnten dem Prozess einfach den ganzen Speicher zur verfügung stellen. Wenn wir jedoch mehrere Prozesse haben müssen wir den Speicher irgendwie verwalten und aufteilen.
 
+## Swaping
+Swaping ist die Benützung von sekundärspeicher als ausgelageter Arbeitspeicher. Hiest teile des RAMs werden auf die Festplatten ausgelagert und bei bedarf wieder eingewechselt. Dieser Vorgang ist stark durch die I/O geschwindigkeit des verwendeten Block-device limitiert und sehr langsam. Als faustregel kann etwa 1/4 des RAM als SWAP reserviert werden, sollte aber bei modernen Systemen nicht mehr nötig sein. 
 
+## Simple Memory Management
+Jeder Prozess bekommt einen Adress space in dem er Arbeiten kann, dieser ist jedoch **unabhängig** von der Physischen adress. Bei bedarf werden Prozesse auf den SWAP ausgelagert und wieder wieder eingesetzt. 
+
+<img src="img/simple_mem_management.PNG" alt="drawing" width="200"/>
+
+## Placement algorithm 
+* First fit
+  * von oben, welches freie Segment als Erstes passt
+  * obere teil des Memory meist am meisten benutzt
+* Best fit
+  * welches freie Segement am besten auf die grösse der Memory request passt
+  * resultiert in vielen kleinen Fragmenten
+* Next fit
+  * vom letzen gefüllten Segment das nächste welches passt
+  * fragmentiert den ganzen Memory
+
+<img src="img/mem_alg.PNG" alt="drawing" width="300"/>
+
+## [Buddy Algorithm](https://www.youtube.com/watch?v=t49Vgj5MvMg)
+Wir haben eine bestimmte Menge an Speicher zur verfügung und teilen diese immer in die hälfte so gennante `buddies`. Einen dieser Buddies teilen wir weiter bis der Prozess in eine Solche hälfte best möglich passt. Wenn der Prozess terminiert fusionieren frei buddies wieder zusammen. 
+
+* Pro:
+  * Sehr einfach in der implementation
+  * Schnell im Speicher allozieren und deallozieren
+* Con:
+  * Braucht speicher grössen welche eine Potenz von 2 sind
+  * Führt zu erheblicher interner fragmentation.
+
+<img src="img/Buddy_alg.PNG" alt="drawing" width="600"/>
+
+## Free space management
+Die Grundidee ist das wir Buch führen über welche Speichereinheiten frei sind oder belegt sind.\
+Wir können dies mittels zweier Strukturen umsetzen `bitmap` oder einer `linked list`
+
+### Linked list
+Wir haben eine Linked list von freien Speicher Blöcken. Immer wenn ein Speicherblock frei wird pointen wir das Ende der Linked list auf den Frei gewordenen Block. So erhalten wir eine Komplette liste des freien Speichers. Wenn Speicher benötigt wird kann der Porzess einfach Blöcke vom Anfang der Liste beanspruchen.
+
+* Pro: 
+  * easy removal / addition
+  * relativ einfach zu Implementieren.
+* Cons:
+  * pointer overhead
+  * Traversierung sehr innefizeint. 
+
+<img src="img/linked_list.PNG" alt="drawing" width="300"/>
+
+### Bitmap
+// todo 
+
+## Pages and Frames
+<img src="img/pages_frames.PNG" alt="drawing" width="500"/>
+
+### Pages 
+* Teile Prozesse in gleich grosse Blöcke genant `pages` auf
+* `Page table` besteht aus einträgen für jede individuelle page
+
+Ein `page table entry` sieht so aus:
+<img src="img/page_table_entry.PNG" alt="drawing" width="500"/>
+
+Die Virutelle Adresse wird von der `MMU` übersetzt. 
+
+### Frames
+* Teile den phyischen speicher in gleich grosse Blöcke genant `frames` auf
+  * Für die Konvertierung zwischen logischen und phyischen adressen wird eine `Memory Management Unit (MMU)` benögtigt. 
 
 # I/O 
 Aus Nutzersicht gibt es zwei verschiedene Gerätekategorien:
@@ -381,7 +460,7 @@ From a user perspective there are
 
 ## I/O HW Architecture
 
-<img src="img/IO_HW_architecture.png" alt="drawing" width="400"/>
+<img src="img/IO_HW_architecture.PNG" alt="drawing" width="400"/>
 
 
 ### I/O controller 
